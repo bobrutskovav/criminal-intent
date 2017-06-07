@@ -1,5 +1,7 @@
 package com.hello.aleks.criminalintent;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -27,12 +29,15 @@ public class CrimeFragment extends Fragment {
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
+    private int mPosition;
 
     private static final String ARG_CRIME_ID = "crime_id";
+    private static final String ARG_ADAPTER_POS = "adapter_pos";
 
-    public static CrimeFragment newInstance(UUID crimeId) {
+    public static CrimeFragment newInstance(UUID crimeId, int adapterPosition) {
         Bundle args = new Bundle();
         args.putSerializable(ARG_CRIME_ID, crimeId);
+        args.putInt(ARG_ADAPTER_POS, adapterPosition);
         CrimeFragment fragment = new CrimeFragment();
         fragment.setArguments(args);
         return fragment;
@@ -42,7 +47,11 @@ public class CrimeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
+        mPosition = getArguments().getInt(ARG_ADAPTER_POS);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
+        Intent intent = new Intent();
+        intent.putExtra(ARG_ADAPTER_POS, mPosition);
+        getActivity().setResult(Activity.RESULT_OK, intent);
     }
 
     @Nullable
@@ -85,4 +94,7 @@ public class CrimeFragment extends Fragment {
         return DateUtils.formatDateTime(this.getContext(), date.getTime(), DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_MONTH | DateUtils.FORMAT_SHOW_YEAR);
     }
 
+    public static int getAdapterPosFromData(Intent data) {
+        return data.getIntExtra(ARG_ADAPTER_POS, 0);
+    }
 }

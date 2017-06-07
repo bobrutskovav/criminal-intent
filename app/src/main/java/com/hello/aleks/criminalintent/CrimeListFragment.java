@@ -1,5 +1,6 @@
 package com.hello.aleks.criminalintent;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import java.util.List;
 public class CrimeListFragment extends Fragment {
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+    private final int REQUEST_POSITION_CODE = 8;
 
     @Nullable
     @Override
@@ -33,10 +35,20 @@ public class CrimeListFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        updateUI();
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            updateUI();
+            return;
+        } else {
+            if (data == null) {
+                updateUI();
+            } else {
+                int pos = CrimeFragment.getAdapterPosFromData(data);
+                mAdapter.notifyItemChanged(pos);
+            }
+        }
     }
+
 
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
@@ -74,8 +86,8 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
-            startActivity(intent);
+            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId(), getAdapterPosition());
+            startActivityForResult(intent, REQUEST_POSITION_CODE);
         }
     }
 
