@@ -17,7 +17,9 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 
@@ -29,11 +31,14 @@ public class CrimeFragment extends Fragment {
     private Crime mCrime;
     private EditText mTitleField;
     private Button mDateButton;
+    private Button mTImeButton;
     private CheckBox mSolvedCheckBox;
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
+    private static final String DIALOG_TIME = "DialogTime";
     private static final int REQUEST_DATE_CODE = 0;
+    private static final int REQUEST_TIME_CODE = 1;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -85,6 +90,19 @@ public class CrimeFragment extends Fragment {
                 dialog.show(fragmentManager, DIALOG_DATE);
             }
         });
+
+        mTImeButton = (Button) v.findViewById(R.id.crime_time);
+        mTImeButton.setText(formatTime(mCrime.getTime()));
+        mTImeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getFragmentManager();
+                TimePickerFragment dialog = TimePickerFragment.newInstance(mCrime.getTime());
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_TIME_CODE);
+                dialog.show(fragmentManager, DIALOG_TIME);
+            }
+        });
+
         mSolvedCheckBox = (CheckBox) v.findViewById(R.id.crime_solved);
         //
         mSolvedCheckBox.setChecked(mCrime.isSolved());
@@ -102,6 +120,11 @@ public class CrimeFragment extends Fragment {
         return DateUtils.formatDateTime(this.getContext(), date.getTime(), DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_MONTH | DateUtils.FORMAT_SHOW_YEAR);
     }
 
+    private String formatTime(Date time) {
+        SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+        return localDateFormat.format(time);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK) {
@@ -111,6 +134,11 @@ public class CrimeFragment extends Fragment {
             Date dateFromDatePicker = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(dateFromDatePicker);
             updateDate();
+        }
+        if (requestCode == REQUEST_TIME_CODE) {
+            Date timeFromTimePicker = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+            mCrime.setTime(timeFromTimePicker);
+            mTImeButton.setText(formatTime(mCrime.getTime()));
         }
     }
 

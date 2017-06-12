@@ -29,6 +29,13 @@
         android:layout_marginLeft="@dimen/crime_date_button_margin"
         android:layout_marginRight="@dimen/crime_date_button_margin"/>
 
+    <Button
+        android:id="@+id/crime_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/crime_date_button_margin"
+        android:layout_marginRight="@dimen/crime_date_button_margin"/>
+
     <CheckBox
         android:id="@+id/crime_solved"
         android:layout_width="match_parent"
