@@ -1,8 +1,11 @@
 package com.hello.aleks.criminalintent;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
@@ -29,6 +32,8 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
 
     private static final String ARG_CRIME_ID = "crime_id";
+    private static final String DIALOG_DATE = "DialogDate";
+    private static final int REQUEST_DATE_CODE = 0;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -70,8 +75,20 @@ public class CrimeFragment extends Fragment {
 
         mDateButton = (Button) v.findViewById(R.id.crime_date);
         mDateButton.setText(formatDate(mCrime.getDate()));
-        mDateButton.setEnabled(mCrime.isSolved());
+        mDateButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getFragmentManager();
+                DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE_CODE);
+                dialog.show(fragmentManager, DIALOG_DATE);
+            }
+        });
         mSolvedCheckBox = (CheckBox) v.findViewById(R.id.crime_solved);
+        //
+        mSolvedCheckBox.setChecked(mCrime.isSolved());
+        //
         mSolvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -85,4 +102,19 @@ public class CrimeFragment extends Fragment {
         return DateUtils.formatDateTime(this.getContext(), date.getTime(), DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_MONTH | DateUtils.FORMAT_SHOW_YEAR);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        if (requestCode == REQUEST_DATE_CODE) {
+            Date dateFromDatePicker = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+            mCrime.setDate(dateFromDatePicker);
+            updateDate();
+        }
+    }
+
+    private void updateDate() {
+        mDateButton.setText(mCrime.getDate().toString());
+    }
 }
