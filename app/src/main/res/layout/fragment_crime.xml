@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
@@ -36,5 +37,14 @@
         android:layout_marginLeft="@dimen/crime_date_button_margin"
         android:layout_marginRight="@dimen/crime_date_button_margin"
         android:text="@string/crime_solved_label"/>
+
+    <Button
+        android:id="@+id/delete_crime_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/crime_date_button_margin"
+        android:layout_marginTop="@dimen/delete_button_margin_top"
+        android:text="@string/delete_button_text"
+        tools:text="Delete"/>
 
 </LinearLayout>
