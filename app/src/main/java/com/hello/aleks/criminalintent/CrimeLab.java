@@ -97,4 +97,8 @@ public class CrimeLab {
         return new CrimeCursorWrapper(cursor);
     }
 
+    public void removeCrime(Crime crime) {
+        mCrimes.remove(crime);
+    }
+
 }
