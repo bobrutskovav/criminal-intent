@@ -97,8 +97,10 @@ public class CrimeLab {
         return new CrimeCursorWrapper(cursor);
     }
 
-    public void removeCrime(Crime crime) {
-        mCrimes.remove(crime);
+    public void deleteCrime(Crime crime) {
+        String id = crime.getId().toString();
+        mDatabase.delete(CrimeTable.NAME, CrimeTable.Cols.UUID + " = ?", new String[]{id});
+
     }
 
 }
