@@ -35,13 +35,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            tools:text="SOOOOOOME DAte"
             />
 
         <CheckBox
             android:id="@+id/crime_solved"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.3"
             android:text="@string/crime_solved_label"/>
     </LinearLayout>
 
@@ -51,7 +52,31 @@
         android:orientation="horizontal"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="@dimen/delete_button_margin_top">
+        android:layout_marginTop="20dp"
+        >
+
+        <Button
+            android:id="@+id/crime_suspect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/crime_suspect_text"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/crime_report"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/crime_report_text"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="15dp">
 
         <Button
             android:id="@+id/delete_crime_button"
@@ -59,7 +84,6 @@
             android:layout_height="wrap_content"
             android:text="@string/delete_button_text"
             tools:text="@string/delete_button_text"/>
-
     </LinearLayout>
 
 </LinearLayout>

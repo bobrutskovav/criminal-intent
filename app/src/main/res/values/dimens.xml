@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="crime_date_button_margin">16dp</dimen>
+    <dimen name="crime_default_button_margin">16dp</dimen>
     <dimen name="list_item_crime_padding">4dp</dimen>
     <dimen name="delete_button_margin_top">100dp</dimen>
     <dimen name="empty_crime_text_size">30sp</dimen>
