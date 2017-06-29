@@ -2,7 +2,11 @@ package com.hello.aleks.criminalintent;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -36,10 +40,12 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mDeleteButton;
     private Button mReportButton;
+    private Button mSuspectButton;
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE_CODE = 0;
+    private static final int REQUEST_CONTACT_CODE = 1;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -130,6 +136,25 @@ public class CrimeFragment extends Fragment {
                 startActivity(i);
             }
         });
+
+        mSuspectButton = (Button) v.findViewById(R.id.crime_suspect);
+        final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        mSuspectButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(pickContact, REQUEST_CONTACT_CODE);
+            }
+        });
+        if (mCrime.getSuspect() != null) {
+            mSuspectButton.setText(mCrime.getSuspect());
+        }
+
+        PackageManager packageManager = getActivity().getPackageManager();
+        if (packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
+            mSuspectButton.setEnabled(false);
+        }
+
         return v;
 
 
@@ -148,6 +173,27 @@ public class CrimeFragment extends Fragment {
             Date dateFromDatePicker = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(dateFromDatePicker);
             updateDate();
+        } else if (requestCode == REQUEST_CONTACT_CODE && data != null) {
+            Uri contentUri = data.getData();
+            //Определение полей, значачения которых должно быть возвращены запросом
+            String[] queryFiels = new String[]{ContactsContract.Contacts.DISPLAY_NAME};
+            //Выполнение запроса, contactUri здесь выполняет функции условия where
+            Cursor cursor = getActivity().getContentResolver().query(contentUri, queryFiels, null, null, null);
+            //проверка получения результатов
+            try {
+                if (cursor.getCount() == 0) {
+                    return;
+                }
+
+                cursor.moveToFirst();
+                String suspect = cursor.getString(0);
+                mCrime.setSuspect(suspect);
+                mSuspectButton.setText(suspect);
+
+            } finally {
+                assert cursor != null;
+                cursor.close();
+            }
         }
     }
 
