@@ -47,6 +47,14 @@
         android:text="@string/crime_suspect_text"/>
 
     <Button
+        android:id="@+id/call_suspect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/crime_default_button_margin"
+        android:layout_marginEnd="@dimen/crime_default_button_margin"
+        android:text="@string/call_suspect"/>
+
+    <Button
         android:id="@+id/crime_report_button"
         android:layout_width="match_parent"
         android:layout_marginStart="@dimen/crime_default_button_margin"

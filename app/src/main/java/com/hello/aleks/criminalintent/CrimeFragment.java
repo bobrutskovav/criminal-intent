@@ -29,6 +29,8 @@ import android.widget.EditText;
 import java.util.Date;
 import java.util.UUID;
 
+import static android.provider.ContactsContract.CommonDataKinds.Phone;
+
 
 /**
  * Created by Aleks on 28.05.2017.
@@ -42,11 +44,13 @@ public class CrimeFragment extends Fragment {
     private Button mDeleteButton;
     private Button mReportButton;
     private Button mSuspectButton;
+    private Button mCallSuspectButton;
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final int REQUEST_DATE_CODE = 0;
     private static final int REQUEST_CONTACT_CODE = 1;
+    private static final int REQUEST_CONTACT_PHONE_CODE = 2;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -140,6 +144,7 @@ public class CrimeFragment extends Fragment {
 
         mSuspectButton = (Button) v.findViewById(R.id.crime_suspect);
         final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+
         mSuspectButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -155,6 +160,25 @@ public class CrimeFragment extends Fragment {
         if (packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
             mSuspectButton.setEnabled(false);
         }
+
+        mCallSuspectButton = (Button) v.findViewById(R.id.call_suspect);
+
+        mCallSuspectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri phone = Uri.parse("tel:" + mCrime.getSuspectPhone());
+                Intent intent = new Intent(Intent.ACTION_DIAL, phone);
+                startActivity(intent);
+            }
+        });
+
+        if (mCrime.getSuspect() == null) {
+            if (mCrime.getSuspectPhone() == null || mCrime.getSuspectPhone().isEmpty()) {
+                mCallSuspectButton.setVisibility(View.GONE);
+            }
+        }
+
+
 
         return v;
 
@@ -177,9 +201,9 @@ public class CrimeFragment extends Fragment {
         } else if (requestCode == REQUEST_CONTACT_CODE && data != null) {
             Uri contentUri = data.getData();
             //Определение полей, значачения которых должно быть возвращены запросом
-            String[] queryFiels = new String[]{ContactsContract.Contacts.DISPLAY_NAME};
+            String[] queryFields = new String[]{ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts._ID};
             //Выполнение запроса, contactUri здесь выполняет функции условия where
-            Cursor cursor = getActivity().getContentResolver().query(contentUri, queryFiels, null, null, null);
+            Cursor cursor = getActivity().getContentResolver().query(contentUri, queryFields, null, null, null);
             //проверка получения результатов
             try {
                 if (cursor.getCount() == 0) {
@@ -188,8 +212,29 @@ public class CrimeFragment extends Fragment {
 
                 cursor.moveToFirst();
                 String suspect = cursor.getString(0);
+                String suspectId = cursor.getString(1);
                 mCrime.setSuspect(suspect);
-                mSuspectButton.setText(suspect);
+                mSuspectButton.setText(mCrime.getSuspect());
+
+                Uri phoneUri = Phone.CONTENT_URI;
+
+                queryFields = new String[]{Phone.NUMBER};
+                cursor = getActivity().getContentResolver().query(phoneUri, queryFields, Phone.CONTACT_ID + " = " + suspectId, null, null);
+                cursor.moveToFirst();
+                if (cursor.getCount() == 0) {
+                    mCrime.setSuspectPhone(null);
+                    mCallSuspectButton.setVisibility(View.GONE);
+                    return;
+                }
+                String phone = cursor.getString(0);
+                // final Intent pickContactPhone = new Intent(Intent.ACTION_PICK,);
+                //       cursor = getActivity().getContentResolver().query()
+
+
+                if (phone != null) {
+                    mCrime.setSuspectPhone(phone);
+                    mCallSuspectButton.setVisibility(View.VISIBLE);
+                }
 
             } finally {
                 assert cursor != null;
